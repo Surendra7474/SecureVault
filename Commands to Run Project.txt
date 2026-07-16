@@ -8,47 +8,38 @@ Frontend:
   cd frontend && npm run dev
 
 
-=== DEPLOYMENT: RENDER (Backend) ===
+=== DEPLOYMENT: RENDER (Backend - H2 Database) ===
 
-1. Create a Web Service on Render connected to your GitHub repo
+1. Create a Web Service on Render connected to your GitHub repo:
+   https://github.com/Surendra7474/SecureVault.git
+
+   Settings:
+   - Name: securevault-api
    - Root Directory: backend
-   - Build Command: ./mvnw clean package -DskipTests
-   - Start Command: java -jar target/*.jar
-   - (Or use Docker: set Dockerfile path to backend/Dockerfile)
+   - Runtime: Docker
+   - (Or native Java 17: Build = ./mvnw clean package -DskipTests, Start = java -jar target/*.jar)
 
 2. Add ENVIRONMENT VARIABLES on Render:
 
-   # --- Database (MySQL on PlanetScale or Render MySQL) ---
-   SPRING_DATASOURCE_URL=jdbc:mysql://<host>:<port>/securevault?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
-   SPRING_DATASOURCE_USERNAME=<your-db-username>
-   SPRING_DATASOURCE_PASSWORD=<your-db-password>
-   SPRING_PROFILES_ACTIVE=mysql
-
-   # --- JWT & Encryption (generate strong base64 keys) ---
+   SERVER_PORT=8080
+   FRONTEND_URL=https://secure-vault-steel-theta.vercel.app
    JWT_SECRET=<your-base64-encoded-256-bit-key>
    VAULT_ENCRYPTION_KEY=<your-base64-encoded-256-bit-key>
-
-   # --- Email (Gmail SMTP) ---
    MAIL_USERNAME=<your-gmail>
    MAIL_PASSWORD=<your-gmail-app-password>
 
-   # --- Frontend ---
-   FRONTEND_URL=https://<your-vercel-app>.vercel.app
-
-   # --- Server ---
-   SERVER_PORT=8080
+   (Generate secure keys: openssl rand -base64 32)
 
 
 === DEPLOYMENT: VERCEL (Frontend) ===
 
-1. Import your GitHub repo to Vercel
-   - Root Directory: frontend
-   - Framework Preset: Vite
-   - Build Command: npm run build
-   - Output Directory: dist
+Already deployed at: https://secure-vault-steel-theta.vercel.app
 
-2. Add ENVIRONMENT VARIABLES on Vercel:
+1. Go to Vercel Dashboard → Settings → Environment Variables
+2. Add:
    VITE_API_URL=https://<your-render-app>.onrender.com/api
+
+3. Redeploy (Settings → Deployments → Redeploy latest)
 
 
 === PRODUCTION BUILD (Local) ===
