@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: securevault-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: securevault
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build:
+      context: ./securevault-backend
+      dockerfile: Dockerfile
+    container_name: securevault-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/securevault
+      DB_USER: root
+      DB_PASSWORD: password
+      JWT_SECRET: dGhpc0lzQVZlcnlTdHJvbmdTZWNyZXRLZXlGb3JKV1RTaWduaW5nVGhhdElzQXRMZWFzdDI1NkJpdHMhISE=
+      VAULT_ENCRYPTION_KEY: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./securevault-frontend
+      dockerfile: Dockerfile
+    container_name: securevault-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
