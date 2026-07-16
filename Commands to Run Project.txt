@@ -1,3 +1,60 @@
-to run backend from project root dir ----> java -jar backend\target\securevault-backend-1.0.0.jar
+=== LOCAL DEVELOPMENT ===
 
-to run frontend ----> cd frontend && npx vite
+Backend:
+  cd backend && mvn spring-boot:run
+  (or) java -jar backend/target/securevault-backend-1.0.0.jar
+
+Frontend:
+  cd frontend && npm run dev
+
+
+=== DEPLOYMENT: RENDER (Backend) ===
+
+1. Create a Web Service on Render connected to your GitHub repo
+   - Root Directory: backend
+   - Build Command: ./mvnw clean package -DskipTests
+   - Start Command: java -jar target/*.jar
+   - (Or use Docker: set Dockerfile path to backend/Dockerfile)
+
+2. Add ENVIRONMENT VARIABLES on Render:
+
+   # --- Database (MySQL on PlanetScale or Render MySQL) ---
+   SPRING_DATASOURCE_URL=jdbc:mysql://<host>:<port>/securevault?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+   SPRING_DATASOURCE_USERNAME=<your-db-username>
+   SPRING_DATASOURCE_PASSWORD=<your-db-password>
+   SPRING_PROFILES_ACTIVE=mysql
+
+   # --- JWT & Encryption (generate strong base64 keys) ---
+   JWT_SECRET=<your-base64-encoded-256-bit-key>
+   VAULT_ENCRYPTION_KEY=<your-base64-encoded-256-bit-key>
+
+   # --- Email (Gmail SMTP) ---
+   MAIL_USERNAME=<your-gmail>
+   MAIL_PASSWORD=<your-gmail-app-password>
+
+   # --- Frontend ---
+   FRONTEND_URL=https://<your-vercel-app>.vercel.app
+
+   # --- Server ---
+   SERVER_PORT=8080
+
+
+=== DEPLOYMENT: VERCEL (Frontend) ===
+
+1. Import your GitHub repo to Vercel
+   - Root Directory: frontend
+   - Framework Preset: Vite
+   - Build Command: npm run build
+   - Output Directory: dist
+
+2. Add ENVIRONMENT VARIABLES on Vercel:
+   VITE_API_URL=https://<your-render-app>.onrender.com/api
+
+
+=== PRODUCTION BUILD (Local) ===
+
+Backend JAR:
+  cd backend && mvn clean package -DskipTests
+
+Frontend dist:
+  cd frontend && npm run build
