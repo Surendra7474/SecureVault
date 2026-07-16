@@ -18,7 +18,7 @@ services:
 
   backend:
     build:
-      context: ./securevault-backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: securevault-backend
     ports:
@@ -36,7 +36,7 @@ services:
 
   frontend:
     build:
-      context: ./securevault-frontend
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: securevault-frontend
     ports:
